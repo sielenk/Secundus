@@ -5,8 +5,6 @@ import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.view.Menu
-import android.view.MenuItem
 import de.masitec.secundus.fragments.CameraFragment
 import de.masitec.secundus.fragments.SmellButtonFragment
 
@@ -33,9 +31,9 @@ class MainActivity : AppCompatActivity() {
         viewPager.adapter = adapter
         viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabReselected(tab: TabLayout.Tab) { }
+            override fun onTabReselected(tab: TabLayout.Tab) {}
 
-            override fun onTabUnselected(tab: TabLayout.Tab) { }
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
 
             override fun onTabSelected(tab: TabLayout.Tab) {
                 viewPager.setCurrentItem(tab.position);
