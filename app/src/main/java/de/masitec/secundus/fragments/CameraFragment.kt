@@ -12,10 +12,10 @@ import de.masitec.secundus.R
 
 class CameraFragment : Fragment() {
     override fun onCreateView(
-            inflater: LayoutInflater?,
+            inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?): View {
-        return inflater!!.inflate(R.layout.tab_camera, container, false)
+        return inflater.inflate(R.layout.fragment_camera, container, false)
     }
 
     override fun onAttach(context: Context) {

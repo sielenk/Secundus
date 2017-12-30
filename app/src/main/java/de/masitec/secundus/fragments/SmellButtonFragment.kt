@@ -11,11 +11,11 @@ import de.masitec.secundus.R
 
 class SmellButtonFragment : Fragment() {
     override fun onCreateView(
-            inflater: LayoutInflater?,
+            inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?): View {
-        val view = inflater!!.inflate(R.layout.tab_smell_button, container, false)
-        val button = view!!.findViewById<Button>(R.id.smell_button)
+        val view = inflater.inflate(R.layout.fragment_smell_button, container, false)
+        val button = view.findViewById<Button>(R.id.smell_button)
 
         button.setOnClickListener { v ->
             v.toString()
