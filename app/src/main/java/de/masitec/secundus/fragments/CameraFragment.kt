@@ -15,14 +15,18 @@ class CameraFragment : Fragment() {
             inflater: LayoutInflater?,
             container: ViewGroup?,
             savedInstanceState: Bundle?): View {
-        val manager = activity.applicationContext.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+        return inflater!!.inflate(R.layout.tab_camera, container, false)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        val manager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
 
         for (cameraId in manager.cameraIdList) {
             val characteristics = manager.getCameraCharacteristics(cameraId)
             val keys = characteristics.keys
 
         }
-
-        return inflater!!.inflate(R.layout.tab_camera, container, false)
     }
 }
