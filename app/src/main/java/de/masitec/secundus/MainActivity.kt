@@ -42,22 +42,4 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        //menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        val id = item?.itemId
-
-        /*
-        when (id) {
-          R.id.action_settings ->
-                  return true
-        }
-        */
-
-        return super.onOptionsItemSelected(item)
-    }
 }
