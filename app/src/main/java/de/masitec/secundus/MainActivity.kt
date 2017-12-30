@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onTabSelected(tab: TabLayout.Tab?) {
+                viewPager.setCurrentItem(tab.position);
             }
         })
     }
