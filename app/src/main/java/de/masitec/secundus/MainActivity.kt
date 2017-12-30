@@ -18,8 +18,8 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         val fragments = listOf(
-                Pair("SmellButton", { SmellButtonFragment() }),
-                Pair("Camera", { CameraFragment() })
+                Pair(R.string.smell_button_tab, { SmellButtonFragment() }),
+                Pair(R.string.camera_tab, { CameraFragment() })
         )
 
         val tabLayout = findViewById<TabLayout>(R.id.tab_layout)
