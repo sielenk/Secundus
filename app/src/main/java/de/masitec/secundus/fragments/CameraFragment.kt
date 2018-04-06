@@ -1,7 +1,12 @@
 package de.masitec.secundus.fragments
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
+import android.hardware.camera2.*
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentActivity
 import android.view.LayoutInflater
 import android.view.SurfaceView
 import android.view.View
@@ -10,6 +15,13 @@ import de.masitec.secundus.R
 
 
 class CameraFragment : Fragment() {
+    companion object {
+        val fragmentPermissionRequestId = 14508
+        val fragmentPermissions = arrayOf(
+                Manifest.permission.CAMERA
+        )
+    }
+
     private var surfaceView: SurfaceView? = null
 
     override fun onCreateView(
@@ -23,5 +35,79 @@ class CameraFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         surfaceView = view.findViewById(R.id.camera_surface_view)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        openCamera()
+    }
+
+    override fun onPause() {
+        closeCamera()
+        super.onPause()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun openCamera() {
+        val activity = activity
+
+        if (activity != null && requestPermissions(activity)) {
+            val cameraManager = activity.getSystemService(CameraManager::class.java)
+            val cameraId = cameraManager.cameraIdList.firstOrNull {
+                val characteristics = cameraManager.getCameraCharacteristics(it)
+                val facing = characteristics.get(CameraCharacteristics.LENS_FACING)
+
+                facing == CameraCharacteristics.LENS_FACING_BACK
+            }
+
+            if (cameraId != null) {
+                cameraManager.openCamera(cameraId, cameraDeviceCallback, null)
+            }
+        }
+    }
+
+    val cameraDeviceCallback = object : CameraDevice.StateCallback() {
+        override fun onOpened(camera: CameraDevice?) {
+            val surfaceView = surfaceView
+
+            if (camera != null && surfaceView != null) {
+                camera.createCaptureSession(listOf(surfaceView.holder.surface), cameraSessionCallback, null)
+            }
+        }
+
+        override fun onDisconnected(camera: CameraDevice?) {
+        }
+
+        override fun onError(camera: CameraDevice?, error: Int) {
+        }
+    }
+
+    val cameraSessionCallback = object : CameraCaptureSession.StateCallback() {
+        override fun onConfigureFailed(session: CameraCaptureSession?) {
+        }
+
+        override fun onConfigured(session: CameraCaptureSession?) {
+            if (session != null) {
+                // session.setRepeatingRequest(...)
+            }
+        }
+    }
+
+    private fun closeCamera() {
+    }
+
+
+    private fun requestPermissions(activity: FragmentActivity): Boolean {
+        val missingPermissions = fragmentPermissions.filter {
+            activity.checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
+        }.toTypedArray()
+
+        val requiresFurtherPermissions = missingPermissions.isEmpty()
+
+        if (!requiresFurtherPermissions) {
+            requestPermissions(missingPermissions, fragmentPermissionRequestId)
+        }
+
+        return requiresFurtherPermissions
     }
 }
