@@ -1,5 +1,5 @@
 <resources>
-    <string name="hello_blank_fragment">Hallo leer fragment</string>
+    <string name="app_name">Secundus</string>
     <string name="smell_button">Stinker Knopf</string>
     <string name="smell_button_tab">Stinker Knopf</string>
     <string name="camera_tab">Kamera</string>

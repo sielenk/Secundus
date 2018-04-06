@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Secundus</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="smell_button">Smell Button</string>
     <string name="smell_button_tab">Smell Button</string>
     <string name="camera_tab">Camera</string>

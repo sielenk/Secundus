@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentStatePagerAdapter
 import de.masitec.secundus.fragments.CameraFragment
 import de.masitec.secundus.fragments.SmellButtonFragment
 
-class SecundusPageAdapter(fm: FragmentManager, val resources: Resources)
+class SecundusPageAdapter(fm: FragmentManager, private val resources: Resources)
     : FragmentStatePagerAdapter(fm) {
 
     private companion object {
