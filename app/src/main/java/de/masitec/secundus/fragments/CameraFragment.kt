@@ -3,7 +3,10 @@ package de.masitec.secundus.fragments
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.hardware.camera2.*
+import android.hardware.camera2.CameraCaptureSession
+import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraDevice
+import android.hardware.camera2.CameraManager
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
@@ -87,8 +90,12 @@ class CameraFragment : Fragment() {
         }
 
         override fun onConfigured(session: CameraCaptureSession?) {
-            if (session != null) {
-                // session.setRepeatingRequest(...)
+            val surfaceView = surfaceView
+            if (session != null && surfaceView != null) {
+                val requestBuilder = session.device.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+                requestBuilder.addTarget(surfaceView.holder.surface)
+                val request = requestBuilder.build()
+                session.setRepeatingRequest(request, null, null)
             }
         }
     }
