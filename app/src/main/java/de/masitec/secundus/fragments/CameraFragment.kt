@@ -14,6 +14,10 @@ import android.view.LayoutInflater
 import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
+import com.google.ar.core.ArCoreApk
+import com.google.ar.core.Session
+import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException
+import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException
 import de.masitec.secundus.R
 
 
@@ -26,6 +30,8 @@ class CameraFragment : Fragment() {
     }
 
     private var surfaceView: SurfaceView? = null
+    private var session: Session? = null
+    private var userRequestedInstall = true
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -43,9 +49,11 @@ class CameraFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         openCamera()
+        openSession()
     }
 
     override fun onPause() {
+        closeSession()
         closeCamera()
         super.onPause()
     }
@@ -116,5 +124,32 @@ class CameraFragment : Fragment() {
         }
 
         return requiresFurtherPermissions
+    }
+
+
+    private fun openSession() {
+        if (session == null) {
+            val requestResult =
+                    try {
+                        ArCoreApk.getInstance().requestInstall(activity, userRequestedInstall)
+                    } catch (e: UnavailableDeviceNotCompatibleException) {
+                    } catch (e: UnavailableUserDeclinedInstallationException) {
+                    }
+
+            when (requestResult) {
+                ArCoreApk.InstallStatus.INSTALLED -> session = Session(activity)
+                ArCoreApk.InstallStatus.INSTALL_REQUESTED -> userRequestedInstall = false
+            }
+        }
+    }
+
+    private fun closeSession() {
+        val sessionBak = session
+
+        session = null
+
+        if (sessionBak != null) {
+            // ... close session ...
+        }
     }
 }
