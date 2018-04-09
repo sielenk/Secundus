@@ -76,10 +76,7 @@ class CameraFragment : Fragment() {
     }
 
     override fun onPause() {
-        val session = session
-        if (session != null) {
-            session.pause()
-        }
+        this.session?.pause()
         timer.cancel()
 
         closeSession()
@@ -211,7 +208,7 @@ class CameraFragment : Fragment() {
 
             val optimizer: LeastSquaresOptimizer = LevenbergMarquardtOptimizer()
                     .withCostRelativeTolerance(1.0e-12)
-                    .withParameterRelativeTolerance(1.0e-12);
+                    .withParameterRelativeTolerance(1.0e-12)
 
             val optimum = optimizer.optimize(foo)
 
