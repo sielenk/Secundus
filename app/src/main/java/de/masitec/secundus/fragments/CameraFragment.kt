@@ -250,5 +250,5 @@ data class Model(val observations: Array<Vector3D>) : MultivariateJacobianFuncti
 }
 
 operator fun Vector3D.plus(other: Vector3D): Vector3D = this.add(other)
-operator fun Vector3D.minus(other: Vector3D): Vector3D = this.minus(other)
+operator fun Vector3D.minus(other: Vector3D): Vector3D = this.subtract(other)
 operator fun Double.times(v: Vector3D): Vector3D = v.scalarMultiply(this)
