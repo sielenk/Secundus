@@ -15,17 +15,18 @@ import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
 import de.masitec.secundus.R
+import java.util.*
 
 
 class CameraFragment : Fragment() {
     companion object {
-        val fragmentPermissionRequestId = 14508
         val fragmentPermissions = arrayOf(
                 Manifest.permission.CAMERA
         )
     }
 
     private var surfaceView: SurfaceView? = null
+    private var camera: CameraDevice? = null
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -42,7 +43,7 @@ class CameraFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        openCamera()
+        openCamera(cameraDeviceCallback)
     }
 
     override fun onPause() {
@@ -50,11 +51,12 @@ class CameraFragment : Fragment() {
         super.onPause()
     }
 
-    @SuppressLint("MissingPermission")
-    private fun openCamera() {
-        val activity = activity
 
-        if (activity != null && requestPermissions(activity)) {
+    @SuppressLint("MissingPermission")
+    private fun openCamera(stateCallback: CameraDevice.StateCallback) {
+        val activity = activity ?: return
+
+        requestPermissions(activity) {
             val cameraManager = activity.getSystemService(CameraManager::class.java)
             val cameraId = cameraManager.cameraIdList.firstOrNull {
                 val characteristics = cameraManager.getCameraCharacteristics(it)
@@ -64,34 +66,43 @@ class CameraFragment : Fragment() {
             }
 
             if (cameraId != null) {
-                cameraManager.openCamera(cameraId, cameraDeviceCallback, null)
+                cameraManager.openCamera(cameraId, stateCallback, null)
             }
         }
     }
 
     val cameraDeviceCallback = object : CameraDevice.StateCallback() {
-        override fun onOpened(camera: CameraDevice?) {
+        override fun onOpened(camera: CameraDevice) {
             val surfaceView = surfaceView
 
-            if (camera != null && surfaceView != null) {
+            if (surfaceView != null) {
                 camera.createCaptureSession(listOf(surfaceView.holder.surface), cameraSessionCallback, null)
             }
+
+            this@CameraFragment.camera = camera
         }
 
-        override fun onDisconnected(camera: CameraDevice?) {
+        override fun onClosed(camera: CameraDevice?) {
+            this@CameraFragment.camera = null
+
+            super.onClosed(camera)
         }
 
-        override fun onError(camera: CameraDevice?, error: Int) {
+        override fun onDisconnected(camera: CameraDevice) {
+        }
+
+        override fun onError(camera: CameraDevice, error: Int) {
         }
     }
 
     val cameraSessionCallback = object : CameraCaptureSession.StateCallback() {
-        override fun onConfigureFailed(session: CameraCaptureSession?) {
+        override fun onConfigureFailed(session: CameraCaptureSession) {
         }
 
-        override fun onConfigured(session: CameraCaptureSession?) {
+        override fun onConfigured(session: CameraCaptureSession) {
             val surfaceView = surfaceView
-            if (session != null && surfaceView != null) {
+
+            if (surfaceView != null) {
                 val requestBuilder = session.device.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
                 requestBuilder.addTarget(surfaceView.holder.surface)
                 val request = requestBuilder.build()
@@ -104,7 +115,10 @@ class CameraFragment : Fragment() {
     }
 
 
-    private fun requestPermissions(activity: FragmentActivity): Boolean {
+    val random = Random()
+    val pendingThunks: MutableMap<Int, () -> Unit> = HashMap()
+
+    private fun requestPermissions(activity: FragmentActivity, onGranted: () -> Unit) {
         val missingPermissions = fragmentPermissions.filter {
             activity.checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
         }.toTypedArray()
@@ -112,9 +126,28 @@ class CameraFragment : Fragment() {
         val requiresFurtherPermissions = missingPermissions.isEmpty()
 
         if (!requiresFurtherPermissions) {
-            requestPermissions(missingPermissions, fragmentPermissionRequestId)
-        }
+            val requestCode = synchronized(pendingThunks) {
+                random.ints()
+                        .filter { !pendingThunks.containsKey(it) }
+                        .findFirst()
+                        .asInt
+            }
 
-        return requiresFurtherPermissions
+            pendingThunks.put(requestCode, onGranted)
+            requestPermissions(missingPermissions, requestCode)
+        } else {
+            onGranted()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+            pendingThunks.remove(requestCode)?.invoke()
+        } else {
+            val missingPermissions = grantResults.zip(permissions)
+                    .filter { it.first != PackageManager.PERMISSION_GRANTED }
+
+            // @ToDo: message
+        }
     }
 }
