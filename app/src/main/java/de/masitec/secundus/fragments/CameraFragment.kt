@@ -133,7 +133,7 @@ class CameraFragment : Fragment() {
                         .asInt
             }
 
-            pendingThunks.put(requestCode, onGranted)
+            pendingThunks[requestCode] = onGranted
             requestPermissions(missingPermissions, requestCode)
         } else {
             onGranted()
